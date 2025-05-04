@@ -1,8 +1,11 @@
 package com.senai.sustentavel.controller;
 
+import com.senai.sustentavel.Categoria;
 import com.senai.sustentavel.dto.AcaoSustentavelRequest;
 import com.senai.sustentavel.dto.AcaoSustentavelResponse;
 import com.senai.sustentavel.exception.RecursoNaoEncontradoException;
+import com.senai.sustentavel.model.AcaoSustentavel;
+import com.senai.sustentavel.repository.AcaoSustentavelRepository;
 import com.senai.sustentavel.service.AcaoSustentavelService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -56,5 +59,29 @@ public class AcaoSustentavelController {
             throw new RecursoNaoEncontradoException("Ação sustentável não encontrada para exclusão com o ID: " + id);
         }
         return ResponseEntity.noContent().build();
+    }
+}import org.springframework.web.bind.annotation.*;
+        import org.springframework.http.ResponseEntity;
+import java.util.List;
+
+@RestController
+@RequestMapping("/acoes")
+public class AcaoSustentavelController {
+
+    private final AcaoSustentavelRepository repository;
+
+    public AcaoSustentavelController(AcaoSustentavelRepository repository) {
+        this.repository = repository;
+    }
+
+    @GetMapping("/categoria")
+    public ResponseEntity<?> buscarPorCategoria(@RequestParam String tipo) {
+        try {
+            Categoria categoria = Categoria.valueOf(tipo.toUpperCase());
+            List<AcaoSustentavel> acoes = repository.findByCategoria(categoria);
+            return ResponseEntity.ok(acoes);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Categoria inválida: " + tipo);
+        }
     }
 }
